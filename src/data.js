@@ -4,6 +4,7 @@ export default [
   {
     owner: "都営地下鉄",
     name: "浅草線",
+    color: "#e83e2f",
     stations: [
       "西馬込",
       "馬込",
@@ -31,6 +32,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "日比谷線",
+    color: "#b5b5ac",
     stations: [
       "中目黒",
       "恵比須",
@@ -60,6 +62,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "銀座線",
+    color: "#ff9500",
     stations: [
       "渋谷",
       "表参道",
@@ -86,6 +89,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "丸ノ内線",
+    color: "#f62e36",
     stations: [
       "荻窪",
       "南阿佐ケ谷",
@@ -118,12 +122,14 @@ export default [
   {
     owner: "東京メトロ",
     name: "丸ノ内線",
+    color: "#f62e36",
     stations: ["方南町", "中野富士見町", "中野新橋", "中野坂上"]
   },
 
   {
     owner: "東京メトロ",
     name: "東西線",
+    color: "#009bbf",
     stations: [
       "中野",
       "落合",
@@ -154,6 +160,7 @@ export default [
   {
     owner: "都営地下鉄",
     name: "三田線",
+    color: "#006ab8",
     stations: [
       "目黒",
       "白金台",
@@ -188,6 +195,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "南北線",
+    color: "#00ac9b",
     stations: [
       "目黒",
       "白金台",
@@ -214,6 +222,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "有楽町線",
+    color: "#c1a470",
     stations: [
       "和光市",
       "地下鉄成増",
@@ -245,6 +254,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "千代田線",
+    color: "#00bb85",
     stations: [
       "代々木上原",
       "代々木公園",
@@ -272,6 +282,7 @@ export default [
   {
     owner: "都営地下鉄",
     name: "新宿線",
+    color: "#b0bf1e",
     stations: [
       "新宿",
       "新宿三丁目",
@@ -300,6 +311,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "半蔵門線",
+    color: "#8f76d6",
     stations: [
       "渋谷",
       "表参道",
@@ -321,6 +333,7 @@ export default [
   {
     owner: "都営地下鉄",
     name: "大江戸線",
+    color: "#ce045b",
     stations: [
       "都庁前",
       "新宿西口",
@@ -367,6 +380,7 @@ export default [
   {
     owner: "東京メトロ",
     name: "副都心線",
+    color: "#9c5e31",
     stations: [
       "和光市",
       "地下鉄成増",
@@ -390,6 +404,7 @@ export default [
   {
     owner: "JR",
     name: "山手線",
+    color: "#80c241",
     stations: [
       "品川",
       "大崎",
@@ -414,6 +429,7 @@ export default [
   {
     owner: "JR",
     name: "東北本線",
+    color: "#00B2E5",
     stations: [
       "東京",
       "神田",
@@ -434,12 +450,14 @@ export default [
   {
     owner: "JR",
     name: "東北本線",
+    color: "#F68B1E",
     stations: ["日暮里", "尾久", "赤羽"]
   },
 
   {
     owner: "JR",
     name: "東海道本線",
+    color: "#00B2E5",
     stations: [
       "東京",
       "有楽町",
@@ -461,18 +479,21 @@ export default [
   {
     owner: "JR",
     name: "東海道本線",
+    color: "#007ac0",
     stations: ["品川", "西大井", "武蔵小杉", "鶴見"]
   },
 
   {
     owner: "JR",
     name: "赤羽線",
+    color: "#00b48d",
     stations: ["池袋", "板橋", "十条", "赤羽"]
   },
 
   {
     owner: "JR",
     name: "中央本線",
+    color: "#FFD400",
     stations: [
       "東京",
       "神田",
@@ -490,16 +511,19 @@ export default [
       "中野",
       "高円寺",
       "南阿佐ケ谷",
-      "荻窪",
+      "荻窪"
+      /*
       "西荻窪",
       "吉祥寺",
-      "三鷹"
+      "三鷹",
+      */
     ]
   },
 
   {
     owner: "JR",
     name: "総武本線",
+    color: "#007ac0",
     stations: [
       "東京",
       "新日本橋",
@@ -510,7 +534,8 @@ export default [
       "新小岩",
       "小岩",
       "市川",
-      "本八幡",
+      "本八幡"
+      /*
       "下総中山",
       "西船橋",
       "船橋",
@@ -521,25 +546,29 @@ export default [
       "新検見川",
       "稲毛",
       "西千葉",
-      "千葉"
+      "千葉",
+      */
     ]
   },
 
   {
     owner: "JR",
     name: "総武本線",
+    color: "#FFD400",
     stations: ["錦糸町", "両国", "浅草橋", "秋葉原", "御茶ノ水"]
   },
 
   {
     owner: "JR",
     name: "京葉線",
+    color: "#C9242F",
     stations: [
       "東京",
       "八丁堀",
       "越中島",
       "潮見",
-      "新木場",
+      "新木場"
+      /*
       "葛西臨海公園",
       "舞浜",
       "新浦安",
@@ -552,15 +581,23 @@ export default [
       "検見川浜",
       "稲毛海岸",
       "千葉みなと",
-      "蘇我"
+      "蘇我",
+      */
     ]
-  },
+  }
 
-  { owner: "JR", name: "外房線", stations: ["千葉", "本千葉", "蘇我"] },
+  /*
+  {
+    owner: "JR",
+    name: "外房線",
+    color: "black",
+    stations: ["千葉", "本千葉", "蘇我"]
+  }
 
   {
     owner: "JR",
     name: "根岸線",
+    color:"black",
     stations: [
       "横浜",
       "桜木町",
@@ -580,6 +617,7 @@ export default [
   {
     owner: "JR",
     name: "鶴見線",
+    color:"black",
     stations: [
       "鶴見",
       "国道",
@@ -597,10 +635,17 @@ export default [
   {
     owner: "JR",
     name: "鶴見線",
+    color:"black",
     stations: ["浅野", "新芝浦", "海芝浦"]
   },
 
-  { owner: "JR", name: "鶴見線", stations: ["武蔵白石", "大川"] }
+  {
+    owner: "JR",
+    name: "鶴見線",
+    color: "black",
+    stations: ["武蔵白石", "大川"]
+  }
+  */
 ];
 
 // vim: set ts=2 sw=2 et:

@@ -1,5 +1,10 @@
-import React from "react";
+import React, { Fragment } from "react";
 import data from "./data.js";
+
+const BACKGROUND_COLOR = "white";
+const BORDER_COLOR = "black";
+const FONT_FAMILY = "monospace";
+const LINE_WIDTH = 4;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -8,6 +13,7 @@ export default class App extends React.Component {
     this.state = {
       viewBox: { top: 0, left: 0, width: props.width, height: props.height },
       lines: data.map(line => ({
+        ...line,
         stations: line.stations.map(station => ({
           name: station,
           x: Math.random() * props.width,
@@ -30,30 +36,51 @@ export default class App extends React.Component {
         viewBox={this.viewBox()}
       >
         {this.state.lines.map((line, i) => (
-          <Line key={i} stations={line.stations} />
+          <Line key={i} stations={line.stations} color={line.color} />
         ))}
       </svg>
     );
   }
 }
 
-const Line = ({ stations }) =>
-  stations.map((station, i) => (
-    <Station key={i} name={station.name} x={station.x} y={station.y} />
-  ));
-
-const Station = ({ name, x, y }) => {
+const Line = ({ stations, color }) => {
   return (
-    <TextBox x={x} y={y} stroke="black" style={{ font: "10px monospace" }}>
-      {name}
-    </TextBox>
+    <Fragment>
+      {stations.slice(0, -1).map((station, i) => (
+        <Section key={i} begin={station} end={stations[i + 1]} color={color} />
+      ))}
+      {stations.map((station, i) => (
+        <Station key={i} name={station.name} x={station.x} y={station.y} />
+      ))}
+    </Fragment>
   );
 };
 
-class TextBox extends React.Component {
+const Station = ({ name, x, y }) => (
+  <BorderedText
+    x={x}
+    y={y}
+    stroke={BORDER_COLOR}
+    style={{ fontFamily: FONT_FAMILY }}
+  >
+    {name}
+  </BorderedText>
+);
+
+const Section = ({ color, begin, end }) => (
+  <line
+    x1={begin.x}
+    y1={begin.y}
+    x2={end.x}
+    y2={end.y}
+    stroke={color}
+    strokeWidth={LINE_WIDTH}
+  />
+);
+
+class BorderedText extends React.Component {
   constructor(props) {
     super(props);
-    this.rect = React.createRef();
     this.text = React.createRef();
     this.state = {
       rectProps: null
@@ -76,19 +103,25 @@ class TextBox extends React.Component {
     const { x, y, style, stroke, children } = this.props;
 
     return (
-      <g>
-        <text ref={this.text} x={x} y={y} style={style}>
-          {children}
-        </text>
+      <Fragment>
         {this.state.rectProps && (
           <rect
-            ref={this.rect}
             stroke={stroke}
-            fill="none"
+            fill={BACKGROUND_COLOR}
             {...this.state.rectProps}
           />
         )}
-      </g>
+        <text
+          ref={this.text}
+          style={style}
+          textAnchor="middle"
+          dominantBaseline="central"
+          x={x}
+          y={y}
+        >
+          {children}
+        </text>
+      </Fragment>
     );
   }
 }
