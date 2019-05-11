@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { sum } from "lodash";
 import data from "./data.js";
 
 const BACKGROUND_COLOR = "white";
@@ -10,17 +11,52 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
 
+    const lines = data.map(line => {
+      const stations = line.stations.map(name => ({
+        name,
+        x: Math.random() * props.width,
+        y: Math.random() * props.height
+      }));
+
+      const sections = calculateSections(stations);
+
+      return {
+        ...line,
+        stations,
+        sections
+      };
+    });
+
     this.state = {
       viewBox: { top: 0, left: 0, width: props.width, height: props.height },
-      lines: data.map(line => ({
-        ...line,
-        stations: line.stations.map(station => ({
-          name: station,
-          x: Math.random() * props.width,
-          y: Math.random() * props.height
-        }))
-      }))
+      lines,
+      score: evaluate(lines),
+      temperature: (props.width + props.height) / 4
     };
+
+    this.update = this.update.bind(this);
+  }
+
+  componentDidMount() {
+    this.update();
+  }
+
+  update() {
+    const modified = modifyLines(
+      this.state.temperature,
+      this.props.width,
+      this.props.height,
+      this.state.lines
+    );
+    const newScore = evaluate(modified);
+    this.setState({ temperature: this.state.temperature * 0.9999 });
+    if (this.state.score <= newScore) {
+      this.setState({
+        lines: modified,
+        score: newScore
+      });
+    }
+    window.requestAnimationFrame(this.update);
   }
 
   viewBox() {
@@ -30,24 +66,49 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <svg
-        width={this.state.viewBox.width}
-        height={this.state.viewBox.height}
-        viewBox={this.viewBox()}
-      >
-        {this.state.lines.map((line, i) => (
-          <Line key={i} stations={line.stations} color={line.color} />
-        ))}
-      </svg>
+      <div>
+        <svg
+          width={this.state.viewBox.width}
+          height={this.state.viewBox.height}
+          viewBox={this.viewBox()}
+        >
+          {this.state.lines.map((line, i) => (
+            <Line
+              key={i}
+              stations={line.stations}
+              sections={line.sections}
+              color={line.color}
+            />
+          ))}
+        </svg>
+
+        <table>
+          <tbody>
+            <tr>
+              <th>score</th>
+              <td>{this.state.score}</td>
+            </tr>
+            <tr>
+              <th>temperature</th>
+              <td>{this.state.temperature}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     );
   }
 }
 
-const Line = ({ stations, color }) => {
+const Line = ({ stations, sections, color }) => {
   return (
     <Fragment>
-      {stations.slice(0, -1).map((station, i) => (
-        <Section key={i} begin={station} end={stations[i + 1]} color={color} />
+      {sections.map((section, i) => (
+        <Section
+          key={i}
+          begin={section.begin}
+          end={section.end}
+          color={color}
+        />
       ))}
       {stations.map((station, i) => (
         <Station key={i} name={station.name} x={station.x} y={station.y} />
@@ -99,6 +160,17 @@ class BorderedText extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.x !== prevProps.x ||
+      this.props.y !== prevProps.y ||
+      this.props.style !== prevProps.style ||
+      this.props.children !== prevProps.children
+    ) {
+      this.componentDidMount();
+    }
+  }
+
   render() {
     const { x, y, style, stroke, children } = this.props;
 
@@ -125,5 +197,59 @@ class BorderedText extends React.Component {
     );
   }
 }
+
+const point = (x, y) => ({ x, y });
+const section = (begin, end) => ({ begin, end });
+
+const evaluate = lines => {
+  let score = 0;
+
+  const sections = lines.flatMap(line => line.sections);
+  for (let i = 0; i < sections.length - 1; ++i) {
+    for (let j = i + 1; j < sections.length; ++j) {
+      if (isCrossing(sections[i], sections[j])) {
+        score -= 1;
+      }
+    }
+  }
+
+  return score;
+};
+
+const isCrossing = (
+  { begin: { x: ax, y: ay }, end: { x: bx, y: by } },
+  { begin: { x: cx, y: cy }, end: { x: dx, y: dy } }
+) => {
+  const ta = (cx - dx) * (ay - cy) + (cy - dy) * (cx - ax);
+  const tb = (cx - dx) * (by - cy) + (cy - dy) * (cx - bx);
+  const tc = (ax - bx) * (cy - ay) + (ay - by) * (ax - cx);
+  const td = (ax - bx) * (dy - ay) + (ay - by) * (ax - dx);
+  return tc * td < 0 && ta * tb < 0;
+};
+
+const modifyLines = (d, maxX, maxY, lines) =>
+  lines.map(line => {
+    const stations = line.stations.map(station => ({
+      ...station,
+      x: Math.min(maxX, Math.max(0, station.x + (Math.random() - 0.5) * d)),
+      y: Math.min(maxY, Math.max(0, station.y + (Math.random() - 0.5) * d))
+    }));
+    const sections = calculateSections(stations);
+    return {
+      ...line,
+      stations,
+      sections
+    };
+  });
+
+const calculateSections = stations =>
+  stations
+    .slice(0, -1)
+    .map((station, i) =>
+      section(
+        point(station.x, station.y),
+        point(stations[i + 1].x, stations[i + 1].y)
+      )
+    );
 
 // vim: set ts=2 sw=2 et:
