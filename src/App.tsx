@@ -1,14 +1,30 @@
-import React, { Fragment } from "react";
+import * as React from "react";
 import { sum } from "lodash";
-import data from "./data.js";
 
-const BACKGROUND_COLOR = "white";
-const BORDER_COLOR = "black";
-const FONT_FAMILY = "monospace";
-const LINE_WIDTH = 4;
+import BorderedText from "./BorderedText";
+import data from "./data";
+import { BORDER_COLOR, FONT_FAMILY, LINE_WIDTH } from "./constants";
+import * as types from "./types";
 
-export default class App extends React.Component {
-  constructor(props) {
+type Props = {
+  width: number;
+  height: number;
+};
+
+type State = {
+  viewBox: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
+  lines: types.Line[];
+  score: number;
+  temperature: number;
+};
+
+export default class App extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     const lines = data.map(line => {
@@ -73,12 +89,7 @@ export default class App extends React.Component {
           viewBox={this.viewBox()}
         >
           {this.state.lines.map((line, i) => (
-            <Line
-              key={i}
-              stations={line.stations}
-              sections={line.sections}
-              color={line.color}
-            />
+            <Line key={i} {...line} />
           ))}
         </svg>
 
@@ -99,9 +110,9 @@ export default class App extends React.Component {
   }
 }
 
-const Line = ({ stations, sections, color }) => {
+const Line = ({ stations, sections, color }: types.Line) => {
   return (
-    <Fragment>
+    <React.Fragment>
       {sections.map((section, i) => (
         <Section
           key={i}
@@ -111,13 +122,13 @@ const Line = ({ stations, sections, color }) => {
         />
       ))}
       {stations.map((station, i) => (
-        <Station key={i} name={station.name} x={station.x} y={station.y} />
+        <Station key={i} {...station} />
       ))}
-    </Fragment>
+    </React.Fragment>
   );
 };
 
-const Station = ({ name, x, y }) => (
+const Station = ({ name, x, y }: types.Station) => (
   <BorderedText
     x={x}
     y={y}
@@ -128,7 +139,7 @@ const Station = ({ name, x, y }) => (
   </BorderedText>
 );
 
-const Section = ({ color, begin, end }) => (
+const Section = ({ color, begin, end }: types.Section) => (
   <line
     x1={begin.x}
     y1={begin.y}
@@ -139,69 +150,7 @@ const Section = ({ color, begin, end }) => (
   />
 );
 
-class BorderedText extends React.Component {
-  constructor(props) {
-    super(props);
-    this.text = React.createRef();
-    this.state = {
-      rectProps: null
-    };
-  }
-
-  componentDidMount() {
-    const bbox = this.text.current.getBBox();
-    this.setState({
-      rectProps: {
-        x: bbox.x,
-        y: bbox.y,
-        width: bbox.width,
-        height: bbox.height
-      }
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.x !== prevProps.x ||
-      this.props.y !== prevProps.y ||
-      this.props.style !== prevProps.style ||
-      this.props.children !== prevProps.children
-    ) {
-      this.componentDidMount();
-    }
-  }
-
-  render() {
-    const { x, y, style, stroke, children } = this.props;
-
-    return (
-      <Fragment>
-        {this.state.rectProps && (
-          <rect
-            stroke={stroke}
-            fill={BACKGROUND_COLOR}
-            {...this.state.rectProps}
-          />
-        )}
-        <text
-          ref={this.text}
-          style={style}
-          textAnchor="middle"
-          dominantBaseline="central"
-          x={x}
-          y={y}
-        >
-          {children}
-        </text>
-      </Fragment>
-    );
-  }
-}
-
-const point = (x, y) => ({ x, y });
-const section = (begin, end) => ({ begin, end });
-
-const evaluate = lines => {
+const evaluate = (lines: types.Line[]) => {
   let score = 0;
 
   const sections = lines.flatMap(line => line.sections);
@@ -216,9 +165,12 @@ const evaluate = lines => {
   return score;
 };
 
+const point = (x: number, y: number) => ({ x, y });
+const segment = (begin: types.Point, end: types.Point) => ({ begin, end });
+
 const isCrossing = (
-  { begin: { x: ax, y: ay }, end: { x: bx, y: by } },
-  { begin: { x: cx, y: cy }, end: { x: dx, y: dy } }
+  { begin: { x: ax, y: ay }, end: { x: bx, y: by } }: types.Segment,
+  { begin: { x: cx, y: cy }, end: { x: dx, y: dy } }: types.Segment
 ) => {
   const ta = (cx - dx) * (ay - cy) + (cy - dy) * (cx - ax);
   const tb = (cx - dx) * (by - cy) + (cy - dy) * (cx - bx);
@@ -227,7 +179,12 @@ const isCrossing = (
   return tc * td < 0 && ta * tb < 0;
 };
 
-const modifyLines = (d, maxX, maxY, lines) =>
+const modifyLines = (
+  d: number,
+  maxX: number,
+  maxY: number,
+  lines: types.Line[]
+) =>
   lines.map(line => {
     const stations = line.stations.map(station => ({
       ...station,
@@ -242,11 +199,11 @@ const modifyLines = (d, maxX, maxY, lines) =>
     };
   });
 
-const calculateSections = stations =>
+const calculateSections = (stations: types.Station[]) =>
   stations
     .slice(0, -1)
     .map((station, i) =>
-      section(
+      segment(
         point(station.x, station.y),
         point(stations[i + 1].x, stations[i + 1].y)
       )
